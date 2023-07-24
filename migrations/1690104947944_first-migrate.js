@@ -20,7 +20,7 @@ exports.up = pgm => {
 	}, {
 		ifNotExists: true
 	})
-	pgm.createTable('transfers', {
+	pgm.createTable('transactions', {
 		id: {
 			type: 'serial',
 			primaryKey: true

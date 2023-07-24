@@ -81,6 +81,54 @@ class EnvelopesController {
 			});
 		}
 	}
+
+	async createEnvelopeTransation(req, res) {
+		const { id } = req.query;
+		const { recipientEnvelopeId, amount } = req.body;
+
+		try {
+			const senderEnvelope = await envelopesService.getEnvelopeById(id);
+			if (senderEnvelope.rowsCount < 1) {
+				return res.status(404).json({
+					error: "Отправитель не найден"
+				})
+			}
+
+			const recipientEnvelope = await envelopesService.getEnvelopeById(recipientEnvelopeId);
+			if (recipientEnvelope.rowsCount < 1) {
+				return res.status(404).json({
+					error: "Получатель не найден"
+				})
+			}
+
+			const newTransaction = await envelopesService.createEnvelopeTransation(id, recipientEnvelopeId, amount);
+
+			res.status(201).json(newTransaction.rows[0]);
+		} catch (err) {
+			return res.status(500).json({
+				error: err.message
+			});
+		}
+	}
+
+	async getEnvelopeTransactions(req, res) {
+		const { id } = req.query;
+
+		try {
+			const transactions = await envelopesService.getEnvelopeTransactions(id);
+
+			if (transactions.rowsCount < 1) {
+				return res.status(404).json({
+					error: "Транзакции не найдены"
+				})
+			}
+			res.json(transactions.rows);
+		} catch (err) {
+			return res.status(500).json({
+				error: err.message
+			});
+		}
+	}
 }
 
 module.exports = new EnvelopesController();

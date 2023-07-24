@@ -1,4 +1,7 @@
 const db = require('./db');
+const moment = require('moment');
+
+const date = moment().format('YYYY-MM-DD HH:mm:ss');
 
 class EnvelopesService {
 
@@ -50,6 +53,41 @@ class EnvelopesService {
 		const query = 'DELETE FROM envelopes WHERE id = $1';
 		const result = db.query(query, [id]);
 		return result;
+	}
+
+
+	async createEnvelopeTransation(senderEnvelopeId, recipientEnvelopeId, amount) {
+		//const envelopeQuery = 'SELECT * FROM envelopes WHERE id = $1';
+		const transactionQuery = 'INSERT INTO transactions(amount, sender_envelope_id, recipient_envelope_id) VALUES($1, $2, $3) RETURNING *';
+		const updateSenderEnvelopeQuery = 'UPDATE envelopes SET balance = balance - $1 WHERE id = $2 RETURNING *';
+		const updateRecipientEnvelopeQuery = 'UPDATE envelopes SET balance = balance + $1 WHERE id = $2 RETURNING *';
+
+		const client = await db.getClient();
+
+		try {
+			await client.query('BEGIN');
+
+			const newTransaction = await client.query(transactionQuery, [amount, senderEnvelopeId, recipientEnvelopeId]);
+
+			await client.query(updateSenderEnvelopeQuery, [amount, senderEnvelopeId]);
+			await client.query(updateRecipientEnvelopeQuery, [amount, recipientEnvelopeId]);
+
+			await client.query('COMMIT');
+
+			return newTransaction;
+		} catch (err) {
+			await client.query('ROLLBACK');
+			throw err;
+		}
+	}
+
+	async getEnvelopeTransactions(id) {
+		if (!id) {
+			throw new Error('Не указан id')
+		}
+		const query = 'SELECT * FROM transactions WHERE sender_envelope_id = $1';
+		const transactions = await db.query(query, [id]);
+		return transactions;
 	}
 }
 

@@ -15,6 +15,9 @@ const pool = new Pool(config);
 module.exports.query = (text, params, callback) => {
 	return pool.query(text, params, callback)
 }
+module.exports.getClient = () => {
+	return pool.connect();
+}
 
 module.exports.migrate = (direction) => {
 	const option = {
