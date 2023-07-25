@@ -7,7 +7,7 @@
     "start": "cross-env NODE_ENV=production node app.js",
     "start-dev": "cross-env NODE_ENV=development nodemon app.js",
     "migrate": "node-pg-migrate",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "cross-env NODE_ENV=development mocha --timeout 5000 --recursive --exit tests/"
   },
   "keywords": [],
   "author": "",
@@ -22,6 +22,9 @@
     "pg": "^8.11.1"
   },
   "devDependencies": {
+    "chai": "^4.3.7",
+    "chai-http": "^4.4.0",
+    "mocha": "^10.2.0",
     "nodemon": "^3.0.1"
   }
 }

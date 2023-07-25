@@ -5,10 +5,12 @@ const app = express();
 const envelopesRouter = require('./routes/envelopes.route');
 
 app.use(express.json());
-app.use('api/envelopes', envelopesRouter);
+app.use('/api/envelopes', envelopesRouter);
 
 const port = process.env.PORT || 3000;
 
 app.listen(port, () => {
 	console.log(`Server start on ${port} port`);
 })
+
+module.exports = app;
