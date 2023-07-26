@@ -39,21 +39,18 @@ class EnvelopesService {
 	}
 
 
-	async createEnvelopeTransation(senderEnvelopeId, recipientEnvelopeId, amount) {
-		//const envelopeQuery = 'SELECT * FROM envelopes WHERE id = $1';
-		const transactionQuery = 'INSERT INTO transactions(amount, sender_envelope_id, recipient_envelope_id) VALUES($1, $2, $3) RETURNING *';
-		const updateSenderEnvelopeQuery = 'UPDATE envelopes SET balance = balance - $1 WHERE id = $2 RETURNING *';
-		const updateRecipientEnvelopeQuery = 'UPDATE envelopes SET balance = balance + $1 WHERE id = $2 RETURNING *';
+	async createEnvelopeTransation(id, title, amount) {
+		const transactionQuery = 'INSERT INTO transactions(title, amount, envelope_id) VALUES($1, $2, $3) RETURNING *';
+		const updateEnvelopeQuery = 'UPDATE envelopes SET balance = balance - $1 WHERE id = $2 RETURNING *';
 
 		const client = await db.getClient();
 
 		try {
 			await client.query('BEGIN');
 
-			const newTransaction = await client.query(transactionQuery, [amount, senderEnvelopeId, recipientEnvelopeId]);
+			const newTransaction = await client.query(transactionQuery, [title, amount, id]);
 
-			await client.query(updateSenderEnvelopeQuery, [amount, senderEnvelopeId]);
-			await client.query(updateRecipientEnvelopeQuery, [amount, recipientEnvelopeId]);
+			await client.query(updateEnvelopeQuery, [amount, id]);
 
 			await client.query('COMMIT');
 

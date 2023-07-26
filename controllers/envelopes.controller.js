@@ -1,4 +1,3 @@
-const express = require('express');
 const envelopesService = require('../services/envelopes.service');
 
 class EnvelopesController {
@@ -130,24 +129,17 @@ class EnvelopesController {
 			})
 		}
 
-		const { recipientEnvelopeId, amount } = req.body;
+		const { title, amount } = req.body;
 
 		try {
-			const senderEnvelope = await envelopesService.getEnvelopeById(id);
-			if (senderEnvelope.rows.length < 1) {
+			const envelope = await envelopesService.getEnvelopeById(id);
+			if (envelope.rows.length < 1) {
 				return res.status(404).json({
-					error: "Отправитель не найден"
+					error: "Запись не найдена"
 				})
 			}
 
-			const recipientEnvelope = await envelopesService.getEnvelopeById(recipientEnvelopeId);
-			if (recipientEnvelope.rows.length < 1) {
-				return res.status(404).json({
-					error: "Получатель не найден"
-				})
-			}
-
-			const newTransaction = await envelopesService.createEnvelopeTransation(id, recipientEnvelopeId, amount);
+			const newTransaction = await envelopesService.createEnvelopeTransation(id, title, amount);
 
 			res.status(201).json(newTransaction.rows[0]);
 		} catch (err) {

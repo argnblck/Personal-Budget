@@ -26,20 +26,19 @@ describe('Functional Tests', () => {
 					done();
 				})
 		});
-		it('Create envelope with balance', (done) => {
+		it('Create envelope with invalid balance', (done) => {
 			chai
 				.request(server)
 				.keepOpen()
 				.post('/api/envelopes')
 				.send({
 					title: 'Second Test Envelope',
-					balance: 200.55
+					balance: '2oo.55'
 				})
 				.end((err, res) => {
-					assert.equal(res.status, 201);
+					assert.equal(res.status, 500);
 					assert.equal(res.type, 'application/json');
-					assert.equal(res.body.title, 'Second Test Envelope');
-					assert.equal(res.body.balance, 200.55);
+					assert.equal(res.body.error, 'invalid input syntax for type numeric: "2oo.55"');
 					done();
 				})
 		});
@@ -159,6 +158,38 @@ describe('Functional Tests', () => {
 					assert.equal(res.status, 404);
 					assert.equal(res.type, 'application/json');
 					assert.equal(res.body.error, 'Запись не найдена');
+					done();
+				})
+		});
+	})
+	describe('Envelope transaction test', () => {
+		it('Create transaction', (done) => {
+			chai
+				.request(server)
+				.keepOpen()
+				.post(`/api/envelopes/${idToDelete}/transactions`)
+				.send({
+					title: 'Test transaction',
+					amount: 200
+				})
+				.end((err, res) => {
+					assert.equal(res.status, 201);
+					assert.equal(res.body.amount, 200);
+					assert.equal(res.body.envelope_id, idToDelete);
+					assert.equal(res.body.title, 'Test transaction');
+					done();
+				})
+		})
+		it('Get envelope by id after transaction', (done) => {
+			chai
+				.request(server)
+				.keepOpen()
+				.get(`/api/envelopes/${idToDelete}`)
+				.end((err, res) => {
+					assert.equal(res.status, 200);
+					assert.equal(res.type, 'application/json');
+					assert.equal(res.body.title, 'Updated Test Envelope');
+					assert.equal(res.body.balance, 1000.55);
 					done();
 				})
 		});

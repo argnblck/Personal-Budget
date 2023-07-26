@@ -10,10 +10,11 @@ exports.up = pgm => {
 		},
 		title: {
 			type: 'varchar(255)',
+			unique: true,
 			notNull: true
 		},
 		balance: {
-			type: 'real',
+			type: 'numeric(1000,2)',
 			notNull: true,
 			default: 0
 		}
@@ -25,19 +26,19 @@ exports.up = pgm => {
 			type: 'serial',
 			primaryKey: true
 		},
+		title: {
+			type: 'varchar(255)',
+			notNull: true
+		},
 		amount: {
-			type: 'real',
+			type: 'numeric(1000,2)',
 			notNull: true,
 		},
-		sender_envelope_id: {
+		envelope_id: {
 			type: 'integer',
 			notNull: true,
 			references: '"envelopes"',
-		},
-		recipient_envelope_id: {
-			type: 'integer',
-			notNull: true,
-			references: '"envelopes"',
+			onDelete: 'cascade'
 		},
 		created_At: {
 			type: 'timestamp',
