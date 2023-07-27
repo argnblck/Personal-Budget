@@ -64,15 +64,15 @@ class TransactionsController {
 
 		try {
 			const transactionToUpdate = await transactionsService.getTransactionById(id);
-			if (transactionToDelete.rows.length < 1) {
+			if (transactionToUpdate.rows.length < 1) {
 				return res.status(404).send({
-					error: "Запись не найдена"
+					error: "Транзакция не найдена"
 				})
 			}
 
 
 			const updatedTransaction = await transactionsService.updateTransactionById(id, title, amount);
-			if (updatedEnvelope.rows.length < 1) {
+			if (updatedTransaction.rows.length < 1) {
 				return res.status(404).json({
 					error: "Запись не найдена"
 				})
@@ -98,7 +98,7 @@ class TransactionsController {
 			const transactionToDelete = await transactionsService.getTransactionById(id);
 			if (transactionToDelete.rows.length < 1) {
 				return res.status(404).send({
-					error: "Запись не найдена"
+					error: "Транзакция не найдена"
 				})
 			}
 			await transactionsService.deleteTransactionById(id);

@@ -34,8 +34,8 @@ class EnvelopesService {
 
 	async deleteEvelopeById(id) {
 		const query = 'DELETE FROM envelopes WHERE id = $1';
-		const result = db.query(query, [id]);
-		return result;
+		await db.query(query, [id]);
+		return;
 	}
 
 
@@ -53,10 +53,13 @@ class EnvelopesService {
 			await client.query(updateEnvelopeQuery, [amount, id]);
 
 			await client.query('COMMIT');
+			await client.end();
 
 			return newTransaction;
 		} catch (err) {
 			await client.query('ROLLBACK');
+			await client.end();
+
 			throw err;
 		}
 	}

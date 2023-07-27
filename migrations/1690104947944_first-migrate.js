@@ -45,7 +45,7 @@ exports.up = pgm => {
 			notNull: true,
 			default: pgm.func('current_timestamp'),
 		},
-		updatedAt: {
+		updated_At: {
 			type: 'timestamp',
 			notNull: true,
 			default: pgm.func('current_timestamp'),
@@ -53,6 +53,19 @@ exports.up = pgm => {
 	}, {
 		ifNotExists: true
 	})
+	pgm.sql(`CREATE OR REPLACE FUNCTION update_updated_At_transactions()
+			RETURNS TRIGGER AS $$
+			BEGIN
+				NEW."updated_At" = CURRENT_TIMESTAMP;
+				RETURN NEW;
+			END;
+			$$ language 'plpgsql';`)
+	pgm.sql(`CREATE TRIGGER update_transactions_updated_At
+			BEFORE UPDATE
+			ON
+				transactions
+			FOR EACH ROW
+			EXECUTE PROCEDURE update_updated_At_transactions ();`)
 };
 
 exports.down = pgm => { };

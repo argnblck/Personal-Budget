@@ -1,5 +1,5 @@
 const Router = require('express-promise-router');
-const transactionsController = require('../controllers/envelopes.controller');
+const transactionsController = require('../controllers/transactions.controller');
 
 const router = new Router();
 
